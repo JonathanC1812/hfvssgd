@@ -39,3 +39,12 @@ def cg(matvec, b, tol=1e-10, max_iter=None): #Solve x in Ax = b, A given only as
         p = r + coef * p
         max_iter -= 1
     return x
+
+def hf(X, y, steps=1, tol=1e-10, max_iter=None): #exact Newton, no lr, no damping
+    d = X.shape[1]
+    w = np.zeros(d)
+    for t in range(steps):
+        g = grad(w, X, y)
+        p = cg(lambda v: hvp(v, X), -g, tol, max_iter) #solve Hp = -g, H never formed
+        w = w + p
+    return w
