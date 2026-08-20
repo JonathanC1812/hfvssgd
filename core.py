@@ -1,7 +1,5 @@
 import numpy as np
 
-# ---------- data ----------
-
 def whiten(Z): #making k = 1
     n = Z.shape[0]
     U, _, Vt = np.linalg.svd(Z, full_matrices=False)
@@ -48,7 +46,7 @@ def grad(w, X, y): #(d,)
     r = X @ w - y
     return X.T @ r / n #dL/dw = X.T (Xw-y) / n = He
 
-def optimal(X, y): #(w_star, L_star); noiseless -> L_star = 0, noisy -> lantai > 0
+def optimal(X, y): #to get w_true (only act as an answer key because complexity is O(nd^2) for X = (nxd))
     w_star, *_ = np.linalg.lstsq(X, y, rcond=None)
     return w_star, loss(w_star, X, y)
 
