@@ -10,7 +10,7 @@ def whiten(Z): #making k = 1
 def spectrum(d, kappa):
     return np.logspace(0, 0.5*np.log10(kappa), d)
 
-def make_data(n, d, kappa, seed=0):
+def make_data(n, d, kappa, seed=0, noise=0.0):
     rng = np.random.default_rng(seed)
     Z = rng.standard_normal((n, d))
     Z = whiten(Z)
@@ -18,6 +18,8 @@ def make_data(n, d, kappa, seed=0):
     X = Z * s
     w_true = rng.standard_normal(d)
     y = X @ w_true
+    if noise > 0.0:
+        y = y + noise * y.std() * rng.standard_normal(n)
     return X, y, w_true
 '''
 Z = random n x d matrix
@@ -45,6 +47,10 @@ def grad(w, X, y): #(d,)
     n = X.shape[0]
     r = X @ w - y
     return X.T @ r / n #dL/dw = X.T (Xw-y) / n = He
+
+def optimal(X, y): #(w_star, L_star); noiseless -> L_star = 0, noisy -> lantai > 0
+    w_star, *_ = np.linalg.lstsq(X, y, rcond=None)
+    return w_star, loss(w_star, X, y)
 
 if __name__ == "__main__":
     next
