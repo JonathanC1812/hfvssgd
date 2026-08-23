@@ -6,6 +6,6 @@ In this experiment, we tested and compared 3 optimization algorithms which are G
 
 The comparison was performed across a range of condition numbers from a well-conditioned one to a badly-conditioned one. We also checked if it holds once a noise was added to the mix, since one of Newton’s guarantees depends on the loss’s shape rather than the data itself. Finally, We chose a synthetic linear regression testbed approach so that we could monitor the condition number directly rather than measuring it after the fact.
 
-#Repo Structure
+# Repo Structure
 
 For our repo structure, we labeled core.py as the holder of the synthetic data generator with a controllable k, the loss and gradient function and k calculator. On the other hand, we built opt.py to hold all the three optimization algorithms (GD, SGD and HF). opt.py also contains the Hessian-vector product function and CG solver to put all the methods on a common cost scale for a better understanding. Finally, all actual experiments and plots are conducted and contained in sweep.ipynb to facilitate a better showcase of data. 
