@@ -137,7 +137,7 @@ Although we will use the hessian matrix, we never have to compute it, hence why 
 Every configuration is run twice, once on clean labels ($y = Xw_{\text{true}}$) and once with noise added as
 
 $$
-y = X w_{\text{true}} + \sigma \, \operatorname{std}(y) \, \epsilon, \qquad \epsilon \sim \mathcal{N}(0, I), \quad \sigma = 0.1
+y = X w_{\text{true}} + \sigma \, \mathrm{std}(y) \, \epsilon, \qquad \epsilon \sim \mathcal{N}(0, I), \quad \sigma = 0.1
 $$
 
 Noise is the falsification test for our hypothesis. It leaves the Hessian $H = X^{\top}X / n$ completely untouched, so the condition number $\kappa$ is identical in both settings, but it raises the optimal loss $L^{*}$ above zero and injects variance into every mini-batch gradient. If HF's advantage really comes from curvature, it should carry over from the clean row to the noisy row unchanged, while SGD should be the one that degrades, since its steps never stop being noisy at the optimum.
