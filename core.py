@@ -35,7 +35,6 @@ def calculate_kappa(X):
     eigen = np.linalg.eigvalsh(H) #symmetric H -> real eigenvalues, ascending
     return eigen[-1] / eigen[0] #k
 
-# ---------- problem ----------
 
 def loss(w, X, y):
     r = X @ w - y
