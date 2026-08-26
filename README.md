@@ -167,3 +167,11 @@ $$
 GD costs $1$ per step, SGD costs $b/n$ per step, and HF costs $1$ for the gradient of each outer step plus $1$ for every CG iteration inside it, since a Hessian-vector product $Bp = X^{\top}(Xp)/n$ costs the same as a gradient.
 
 The second series is **wall-clock time**, measured per run with `time.perf_counter()`. Cost is a model of runtime, not runtime itself, so the two are reported side by side for benchmark. However, this itself isn't solely reliable because it relies heavily on external factor such as the hardware this program is being run.
+
+
+# Results
+---
+
+## Without Noise
+For our first experiment, we measure each algorithm until reaching a specific cost then we measure the loss of each algorithm by the time that cost is reached. Here, we have to cost limit which are $C = 100$ and $C=10000$. In both cases, we are able to see that HF consistently outperforms the other by having a low loss after reaching the cost limit. At $C=100$, we can see that SGD didn't perform that well, especially at higher $k$. Although that, Gradient Descent still performs significantly worse, which is because GD uses more cost compared to SGD because each step of SGD is very cheap. However in $C=10000$, SGD and HF performs similarly, however GD performs significantly worse than the other in higher $k$.
+When measured on how much `cost` is required to reach a error tolerance threeshold $10^{-2}$, we can se that SGD performs similarly to HF. Before $k=1000$, SGD slightly outperforms HF. However, they intersect at $k=1000$ where HF slightly outperforms SGD. On lower kappa, note too that GD performs quite well. However, as $k$ grows, we can see that GD performs significantly worse. However at $\epsilon = 10^{-6}$ the pattern is quite similar, however HF overtook SGD way faster at $k=36$. After $k=36$, SGD also performs significantly worse compared to HF, where GD and SGD cost both linearly increase with respect to $k$
