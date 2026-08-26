@@ -8,7 +8,7 @@ The comparison was performed across a range of condition numbers from a well-con
 
 # Repo Structure
 
-For our repo structure, we labeled core.py as the holder of the synthetic data generator with a controllable k, the loss and gradient function and k calculator. On the other hand, we built opt.py to hold all the three optimization algorithms (GD, SGD and HF). opt.py also contains the Hessian-vector product function and CG solver to put all the methods on a common cost scale for a better understanding. Finally, all actual experiments and plots are conducted and contained in sweep.ipynb to facilitate a better showcase of data. 
+For our repo structure, we labeled core.py as the holder of the synthetic data generator with a controllable k, the loss and gradient function and k calculator. On the other hand, we built opt.py to hold all the three optimization algorithms (GD, SGD and HF). opt.py also contains the Hessian-vector product function and CG solver to put all the methods on a common cost scale for a better understanding. Finally, all actual experiments and plots are conducted and contained in sweep.ipynb initialize and showcase the data.
 
 # Methods
 
@@ -167,3 +167,45 @@ $$
 GD costs $1$ per step, SGD costs $b/n$ per step, and HF costs $1$ for the gradient of each outer step plus $1$ for every CG iteration inside it, since a Hessian-vector product $Bp = X^{\top}(Xp)/n$ costs the same as a gradient.
 
 The second series is **wall-clock time**, measured per run with `time.perf_counter()`. Cost is a model of runtime, not runtime itself, so the two are reported side by side for benchmark. However, this itself isn't solely reliable because it relies heavily on external factor such as the hardware this program is being run.
+
+
+# Discussion of Results
+The benchmarking result in this project is all presented in `sweep.ipynb` where the graph of each benchmark is plotted using `matplotlib`. In this benchmarking process, we have 2 stages where each stages have 2 different tests, which is by doing:
+- Without Noise
+  - Measuring the `loss` of each algorithm after reaching a certain `cost` with respect to $k$
+  - Fixed error tolerance
+    - Measured the `cost` of each algorithm to reach the loss tolerance with respect to $k$
+    - Measured the time in seconds of each algorithm to reach the loss tolerance with respect to $k$
+-With Noise
+  - Measuring the `loss` of each algorithm after reaching a certain `cost` with respect to $k$
+  - Fixed error tolerance
+    - Measured the `cost` of each algorithm to reach the loss tolerance with respect to $k$
+    - Measured the time in seconds of each algorithm to reach the loss tolerance with respect to $k$
+
+
+## Without Noise
+For our first experiment, we measure each algorithm until reaching a specific cost then we measure the loss of each algorithm by the time that cost is reached. Here, we have to cost limit which are $C = 100$ and $C=10000$. In both cases, we are able to see that HF consistently outperforms the other by having a low loss after reaching the cost limit. At $C=100$, we can see that SGD didn't perform that well, especially at higher $k$. Although that, Gradient Descent still performs significantly worse, which is because GD uses more cost compared to SGD because each step of SGD is very cheap. However in $C=10000$, SGD and HF performs similarly, however GD performs significantly worse than the other in higher $k$.
+
+When measured on how much `cost` is required to reach a error tolerance threeshold $10^{-2}$, we can se that SGD performs similarly to HF. Before $k=1000$, SGD slightly outperforms HF. However, they intersect at $k=1000$ where HF slightly outperforms SGD. On lower kappa, note too that GD performs quite well. However, as $k$ grows, we can see that GD performs significantly worse. However at $\epsilon = 10^{-6}$ the pattern is quite similar, however HF overtook SGD way faster at $k=36$. After $k=36$, SGD also performs significantly worse compared to HF, where GD and SGD cost both linearly increase with respect to $k$
+A similar pattern occurs when looking at the time to reach the error tolerance threeshold, however this time, the intersection occurs later.
+
+## With Noise
+In a linear regression, the typical solution looks like $Xw = y$, where given X as a dataset and y as the answer, we need the model to find the corresponding w. When we add a noise, it will looks like $y = Xw + noise$ so that it is impossible to have a loss as 0. Although that, it didn't affect the performance of each algorithm that much. In the first dataset where we measure the loss of each agorithm after reaching a certain cost, at $C=100$ and $C=10000$, the loss of SGD remains steadily high, indicating that don't matter the kappa, the loss still remains high. Meanwhile, GD happens to have a sharp increase at $k=10$ for $C=100$ and $k=10^3$ for $C=10000$. On the other hand, HF remains steadily low. From both of this experience, we are able to see that if we have a specific constraint of cost, HF is able to maintain the lowest amount of loss for a limited cost compared to GD and SGD.
+
+While measuring the cost of each algorithm to reach a certain error tolerance threeshold, we receive very similar patterns compared to when done with noise. However, it is important to see that on $\epsilon = 10^{-6}$, SGD performs exceptionally worse compared to both of the algorithm which did not happened before. This is because when the labels are noisy, the gradient isn't as clean as when there are no noise, leaving each indivual step to be affected by some random amount. Since SGD didn't converge linearly, it cost isn't ~$log(\frac{1}{\epsilon})$ anymore but instead ~$\frac{1}{\epsilon}$ which leads to the growth of the cost of SGD to be very fast when $\epsilon$ decreases. So, in a high noise and low error tolerance, our experiment shows that SGD underperforms and HF is the clear advantage.
+
+# Limitations
+- This research is only done in a quadratic problem, which is typically rare in a neural network but instead favors HF because of HF implementing CG as it's method
+- Haven't tested edge cases for 
+  - $n < d$
+  - $\lambda_{min} < 0$
+
+  which allows for HF to not need damping and no need to use a non-linear CG.
+- Didn't count cost for SGD to find the proper learning rate
+- Unable to experiment a higher rate for d because of hardware and computation limitation
+- Test is only done in a single hardware, which might be different when calculating time in another hardware
+
+# Reference
+Martens, James. Deep Learning via Hessian-Free optimization. *ICML*, 2010.
+
+Pearlmutter, B. A. Fast exact multiplication by the hessian. *Neural Computation*, 1994.
